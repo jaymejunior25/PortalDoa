@@ -1,0 +1,76 @@
+body {
+    overflow-x: hidden;
+    background-color: #e9ecef; /* Cor de fundo suave */
+}
+
+#wrapper {
+    display: flex;
+    align-items: flex-start;
+    height: 100vh; /* Garantir que o wrapper ocupe toda a altura da tela */
+}
+
+#sidebar-wrapper {
+    min-height: 100vh;
+    width: 250px;
+    background-color: #343a40;
+    color: white;
+    transition: margin 0.25s ease-out;
+    position: fixed; /* Manter a barra lateral fixa na lateral */
+    top: 56px; /* Ajustar para a altura da barra superior */
+    left: 0;
+    z-index: 1000; /* Garantir que fique acima do conteúdo */
+}
+
+#page-content-wrapper {
+    margin-left: 250px; /* Espaço para a barra lateral */
+    margin-top: 56px; /* Espaço para a barra superior */
+    width: calc(100% - 250px); /* Ajustar largura considerando a barra lateral */
+    transition: margin 0.25s ease-out;
+}
+
+#wrapper.toggled #sidebar-wrapper {
+    margin-left: -250px; /* Ocultar a barra lateral */
+}
+
+#wrapper.toggled #page-content-wrapper {
+    margin-left: 0; /* Ajustar o conteúdo quando a barra lateral está oculta */
+    width: 100%; /* Ajustar largura quando a barra lateral está oculta */
+}
+
+#top-navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1100; /* Garantir que a barra superior fique acima da barra lateral */
+    background-color: #f8f9fa; /* Cor de fundo da barra superior */
+    border-bottom: 1px solid #ddd; /* Linha inferior para separação */
+}
+
+.sidebar-heading {
+    padding: 1rem;
+    font-size: 1.2rem;
+    text-align: center;
+    background-color: #28a745; /* Cor verde para o cabeçalho da barra lateral */
+}
+
+.list-group-item {
+    border: none;
+}
+
+.list-group-item:hover {
+    background-color: #28a745; /* Cor verde para itens selecionados */
+}
+
+.navbar {
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #ddd; /* Linha inferior para separação */
+}
+
+#sidebar-toggle {
+    font-size: 1.5rem;
+}
+
+#another-button {
+    font-size: 1rem;
+}
