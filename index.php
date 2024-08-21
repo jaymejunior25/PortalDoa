@@ -1,3 +1,15 @@
+<?php
+session_start();
+include 'db.php';
+
+if (!isset($_SESSION['user_id'])) {
+    header('Location: login.php');
+    exit();
+}
+
+$documento =  $_SESSION['user_id'];
+$name =  $_SESSION['username']
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,6 +19,7 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
     <link href="css/styles.css" rel="stylesheet">
+    <link rel="icon" type="image/png" href="icon2.png" sizes="32x32" />
 </head>
 <body>
     <div class="d-flex" id="wrapper">
@@ -18,7 +31,7 @@
                 <a href="#" class="list-group-item list-group-item-action bg-dark text-white" onclick="loadPage('home')">Home</a>
                 <a href="#" class="list-group-item list-group-item-action bg-dark text-white" onclick="loadPage('about')">Serviço 1</a>
                 <a href="#" class="list-group-item list-group-item-action bg-dark text-white" onclick="loadPage('services')">Serviço 2</a>
-                <a href="#" class="list-group-item list-group-item-action bg-dark text-white" onclick="loadPage('contact')">Serviço 3</a>
+                <a href="#" class="list-group-item list-group-item-action bg-dark text-white" onclick="loadPage('Etiqueta')">Etiqueta 3</a>
             </div>
         </div>
         <!-- /#sidebar-wrapper -->
@@ -29,12 +42,12 @@
                 <button class="btn btn-primary" id="sidebar-toggle">
                     <i class="fas fa-bars"></i>
                 </button>
-                <button class="btn btn-secondary ml-2" id="another-button">
-                    Login
-                </button>
+
+                <a href="logout.php" class="btn btn-danger mt-3"><i class="fas fa-sign-out-alt"></i> Logout</a>
+
             </nav>
             <div class="container-fluid" id="content">
-                <h1 class="mt-4">Bem Vindo ao Portal</h1>
+                <h1 class="mt-4">Bem Vindo ao Portal <?php echo ucfirst($name); ?></h1>
                 <p>Escolha uma das opções ao lado.</p>
             </div>
         </div>
