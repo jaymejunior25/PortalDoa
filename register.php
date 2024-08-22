@@ -2,25 +2,35 @@
 session_start();
 include 'db.php';
 
-$error = '';
-
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $cpf = $_POST['cpf'];
     $senha = $_POST['senha'];
 
-    // Consulta para verificar se o CPF e senha estão corretos
-    $stmt = $dbconn2->prepare('SELECT * FROM doador WHERE cpf = :cpf');
-    $stmt->execute([':cpf' => $cpf]);
+    // Verifica se o CPF já existe no banco fixo
+    $stmt = $dbconn->prepare('
+        SELECT * 
+        FROM pessoafisica p
+        LEFT JOIN doctopessoafisica d 
+        ON p.cdpesfis = d.cdpesfis
+        WHERE d.nrdoctoident = :nrdoctoident
+    ');
+    $stmt->execute([':nrdoctoident' => $cpf]);
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    if ($user && password_verify($senha, $user['senha'])) {
-        $_SESSION['user_id'] = $user['id'];
-        $_SESSION['username'] = $user['nome'];
+    if ($user) {
+        // Salva as informações no banco editável
+        $stmt = $dbconn2->prepare('INSERT INTO doador (cpf, nome, senha) VALUES (:cpf, :nome, :senha)');
+        $stmt->execute([
+            ':cpf' => $cpf,
+            ':nome' => $user['nmpesfis'],
+            ':senha' => password_hash($senha, PASSWORD_BCRYPT),
+        ]);
 
-        header('Location: index.php');
+        $_SESSION['success_message'] = 'Senha cadastrada com sucesso!';
+        header('Location: login.php');
         exit();
     } else {
-        $_SESSION['error_message'] = 'CPF ou senha inválidos!';
+        $_SESSION['error_message'] = 'CPF não encontrado!';
     }
 }
 ?>
@@ -30,14 +40,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
+    <title>Cadastro de Senha</title>
     <link rel="icon" type="image/png" href="icon2.png" sizes="32x32" />
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
     <link href="css/styles.css" rel="stylesheet">
     <link rel="icon" type="image/png" href="icon2.png" sizes="32x32" />
     <style>
-                body {
+        body {
             background-color: #f2f9f2; /* Fundo verde claro */
         }
         .login-container {
@@ -60,7 +70,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 </head>
 <body>
     <div class="login-container">
-        <h2 class="text-center mb-4" style="color: #28a745;">Login</h2>
+        <h2 class="text-center mb-4" style="color: #28a745;">Cadastro de Senha</h2>
         <?php if (isset($_SESSION['error_message'])): ?>
             <div class="alert alert-danger">
                 <?php echo $_SESSION['error_message']; unset($_SESSION['error_message']); ?>
@@ -75,10 +85,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 <label for="senha" style="color: #28a745;">Senha</label>
                 <input type="password" name="senha" id="senha" class="form-control" required>
             </div>
-            <button type="submit" class="btn btn-custom btn-block"><i class="fas fa-door-open"></i>Entrar</button>
+            <button type="submit" class="btn btn-custom btn-block"><i class="fas fa-key"></i>Cadastrar Senha</button>
         </form>
         <div class="text-center mt-3">
-            <a href="register.php">Primeiro acesso? Cadastre sua senha aqui</a>
+            <a href="login.php" class="btn btn-secondary"><i class="fas fa-angle-left"></i> Login</a>
         </div>
     </div>
 </body>
