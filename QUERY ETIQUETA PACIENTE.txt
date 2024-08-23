@@ -11,3 +11,18 @@ select pessoafisica.cdpesfis, nmpesfis, TO_CHAR(DHNASCTO, 'DD/MM/YYYY') AS data_
 WHERE PESSOAFISICA.CDPESFIS = DOCTOPESSOAFISICA.CDPESFIS
 and tpdoctoident = 'CPF'
 and pessoafisica.cdpesfis = :CPF
+
+
+
+
+select TO_CHAR(dtcoleta, 'DD/MM/YYYY') AS DATA_COLETA, cdtipobtdoacao from coleta, triagemcandidato
+where coleta.cdpesfiscoleta = triagemcandidato.cdpesfisdoacao
+and hrtermcoleta is not NULL
+and cdpesfiscoleta = '744536'
+
+union
+
+select TO_CHAR(dt_doaca, 'DD/MM/YYYY') AS DATA_COLETA, OBJ140.TP_OBTHE from OBJ110, OBJ140
+where OBJ110.CD_PESFIDOA = OBJ140.CD_PESFI
+and OBJ110.hr_ultatua iS not NULL
+AND CD_PESFIDOA = '744536'

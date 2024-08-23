@@ -28,23 +28,15 @@ function obterDados($cpf) {
 }
 
 // Função para gerar o código ZPL da etiqueta
-function gerarEtiquetaZPL($dados) {
+function gerarEtiquetaZPL($dados, $cpf) {
     $zpl = "^XA";
-    $zpl .= "^FO30,30^A0N,40,40^FD" . $dados['nmpesfis'] . "^FS";  // Nome em posição mais alta e maior
-    $zpl .= "^FO30,100^A0N,35,35^FDData Nasc: " . $dados['data_nascimento'] . "^FS";  // Data de nascimento
-    $zpl .= "^FO30,170^A0N,35,35^FDFenótipo: " . $dados['dsfenotipagem'] . "^FS";  // Fenótipo
+    $zpl .= "^FO30,30^A0N,40,40^FD" . $dados['nmpesfis'] . "^FS";  // Nome
+    $zpl .= "^FO30,80^A0N,35,35^FDCPF: " . $cpf . "^FS";  // CPF
+    $zpl .= "^FO30,130^A0N,35,35^FDData Nasc: " . $dados['data_nascimento'] . "^FS";  // Data de nascimento
+    $zpl .= "^FO30,180^A0N,35,35^FDFenótipo: " . $dados['dsfenotipagem'] . "^FS";  // Fenótipo
     $zpl .= "^XZ";
     
     return $zpl;
-}
-
-
-// Função para enviar o ZPL para a impressora Zebra conectada via USB
-function imprimirEtiquetaUSB($zpl) {
-    $file = "LPT1";  // Porta padrão de uma impressora USB no Windows
-
-    // Enviar o ZPL diretamente para a impressora
-    file_put_contents($file, $zpl);
 }
 
 // Lógica principal
@@ -53,24 +45,28 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $dados = obterDados($cpf);
 
     if ($dados) {
-        // Exibe as informações na tela antes de imprimir
-        echo "<h3>Informações do CPF</h3>";
-        echo "Nome: " . $dados['nmpesfis'] . "<br>";
-        echo "Data de Nascimento: " . $dados['data_nascimento'] . "<br>";
-        echo "Fenótipo: " . $dados['dsfenotipagem'] . "<br>";
+        // Gera o código ZPL
+        $zpl = gerarEtiquetaZPL($dados, $cpf);
 
-        // Formulário para confirmar impressão
-        echo '<form method="POST" action="imprimir.php">';
-        echo '<input type="hidden" name="cpf" value="' . $cpf . '">';
-        echo '<button type="submit">Confirmar Impressão da Etiqueta</button>';
-        echo '</form>';
+        // Cria um arquivo temporário para armazenar o código ZPL
+        $tempFile = tempnam(sys_get_temp_dir(), 'zebra_');
+        file_put_contents($tempFile, $zpl);
+
+        // Envia o arquivo para download
+        header('Content-Type: application/zpl');
+        header('Content-Disposition: attachment; filename="etiqueta.zpl"');
+        header('Content-Length: ' . filesize($tempFile));
+        readfile($tempFile);
+
+        // Remove o arquivo temporário após o download
+        unlink($tempFile);
+        exit();
     } else {
         echo "Dados não encontrados para o CPF informado.";
     }
 }
 ?>
 
-<!-- Formulário HTML para informar o CPF -->
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -90,7 +86,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 <label for="cpf">CPF:</label>
                 <input type="text" class="form-control" id="cpf" name="cpf" required>
             </div>
-            <button type="submit" class="btn btn-primary">Buscar Informações</button>
+            <button type="submit" class="btn btn-primary">Gerar Etiqueta</button>
         </form>
     </div>
 </body>

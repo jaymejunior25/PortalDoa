@@ -13,10 +13,32 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $stmt->execute([':cpf' => $cpf]);
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
+
+    $sql = "SELECT pessoafisica.cdpesfis, 
+                   nmpesfis, 
+                   TO_CHAR(DHNASCTO, 'DD/MM/YYYY') AS data_nascimento, 
+                   tpdoctoident, 
+                   nrdoctoident, 
+                   cdsexo,
+                   dsfenotipagem 
+            FROM pessoafisica 
+            JOIN doctopessoafisica ON pessoafisica.cdpesfis = doctopessoafisica.cdpesfis
+            WHERE tpdoctoident = 'CPF' 
+            AND nrdoctoident = :CPF";
+    
+    $stmt = $dbconn->prepare($sql);
+    $stmt->execute([':CPF' => $cpf]);
+    $user1 = $stmt->fetch(PDO::FETCH_ASSOC);
+
+
     if ($user && password_verify($senha, $user['senha'])) {
         $_SESSION['user_id'] = $user['id'];
         $_SESSION['username'] = $user['nome'];
-
+        $_SESSION['cpf'] = $user['cpf'];
+        $_SESSION['pf'] = $user1['cdpesfis'];
+        $_SESSION['nasc'] = $user1['data_nascimento'];
+        $_SESSION['sexo'] = $user1['cdsexo'];
+        
         header('Location: index.php');
         exit();
     } else {

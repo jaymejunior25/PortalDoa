@@ -5,32 +5,37 @@ include 'db.php';
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $cpf = $_POST['cpf'];
     $senha = $_POST['senha'];
+    $confirmar_nova_senha = $_POST['confirmar_nova_senha'];
 
-    // Verifica se o CPF já existe no banco fixo
-    $stmt = $dbconn->prepare('
-        SELECT * 
-        FROM pessoafisica p
-        LEFT JOIN doctopessoafisica d 
-        ON p.cdpesfis = d.cdpesfis
-        WHERE d.nrdoctoident = :nrdoctoident
-    ');
-    $stmt->execute([':nrdoctoident' => $cpf]);
-    $user = $stmt->fetch(PDO::FETCH_ASSOC);
-
-    if ($user) {
-        // Salva as informações no banco editável
-        $stmt = $dbconn2->prepare('INSERT INTO doador (cpf, nome, senha) VALUES (:cpf, :nome, :senha)');
-        $stmt->execute([
-            ':cpf' => $cpf,
-            ':nome' => $user['nmpesfis'],
-            ':senha' => password_hash($senha, PASSWORD_BCRYPT),
-        ]);
-
-        $_SESSION['success_message'] = 'Senha cadastrada com sucesso!';
-        header('Location: login.php');
-        exit();
+    if ($senha !== $confirmar_nova_senha) {
+        $_SESSION['error_message'] = 'A nova senha e a confirmação da nova senha não correspondem.';
     } else {
-        $_SESSION['error_message'] = 'CPF não encontrado!';
+        // Verifica se o CPF já existe no banco fixo
+        $stmt = $dbconn->prepare('
+            SELECT * 
+            FROM pessoafisica p
+            LEFT JOIN doctopessoafisica d 
+            ON p.cdpesfis = d.cdpesfis
+            WHERE d.nrdoctoident = :nrdoctoident
+        ');
+        $stmt->execute([':nrdoctoident' => $cpf]);
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if ($user) {
+            // Salva as informações no banco editável
+            $stmt = $dbconn2->prepare('INSERT INTO doador (cpf, nome, senha) VALUES (:cpf, :nome, :senha)');
+            $stmt->execute([
+                ':cpf' => $cpf,
+                ':nome' => $user['nmpesfis'],
+                ':senha' => password_hash($senha, PASSWORD_BCRYPT),
+            ]);
+
+            $_SESSION['success_message'] = 'Senha cadastrada com sucesso!';
+            header('Location: login.php');
+            exit();
+        } else {
+            $_SESSION['error_message'] = 'CPF não encontrado!';
+        }
     }
 }
 ?>
@@ -84,6 +89,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <div class="form-group">
                 <label for="senha" style="color: #28a745;">Senha</label>
                 <input type="password" name="senha" id="senha" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label for="confirmar_nova_senha" style="color: #28a745;">Confirmar Nova Senha:</label>
+                <input type="password" name="confirmar_nova_senha" id="confirmar_nova_senha" class="form-control" required>
             </div>
             <button type="submit" class="btn btn-custom btn-block"><i class="fas fa-key"></i>Cadastrar Senha</button>
         </form>
