@@ -22,6 +22,7 @@ try {
         SELECT TO_CHAR(dtcoleta, 'DD/MM/YYYY') AS DATA_COLETA, cdtipobtdoacao 
         FROM coleta, triagemcandidato
         WHERE coleta.cdpesfiscoleta = triagemcandidato.cdpesfisdoacao
+        AND coleta.CDTRIAGEM = TRIAGEMCANDIDATO.CDTRIAGEM
         AND hrtermcoleta IS NOT NULL
         AND cdpesfiscoleta = :PF
 
@@ -30,7 +31,8 @@ try {
         SELECT TO_CHAR(dt_doaca, 'DD/MM/YYYY') AS DATA_COLETA, OBJ140.TP_OBTHE 
         FROM OBJ110, OBJ140
         WHERE OBJ110.CD_PESFIDOA = OBJ140.CD_PESFI
-        AND OBJ110.hr_ultatua IS NOT NULL
+        AND OBJ110.CD_DOACA = OBJ140.CD_DOACA
+        AND OBJ140.hr_TERMI iS not NULL
         AND CD_PESFIDOA = :PF
 
         ORDER BY DATA_COLETA DESC
@@ -131,12 +133,24 @@ if (!empty($resultados)) {
                     <i class="fas fa-bars"></i>
                 </button>
 
-                <a href="logout.php" class="btn btn-danger mt-3"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                <a href="logout.php" class="btn btn-danger "><i class="fas fa-sign-out-alt"></i> Logout</a>
+                <!-- Botão para gerar PDF -->
+                <form action="gerar_pdf.php" method="post">
+                    <input type="hidden" name="name" value="<?php echo htmlspecialchars($name); ?>">
+                    <input type="hidden" name="cpf" value="<?php echo htmlspecialchars($cpf); ?>">
+                    <input type="hidden" name="nascimento" value="<?php echo htmlspecialchars($nascimento); ?>">
+                    <input type="hidden" name="sexo" value="<?php echo htmlspecialchars($sexo); ?>">
+                    <input type="hidden" name="resultados" value="<?php echo htmlspecialchars(json_encode($resultados)); ?>">
+                    <?php if (isset($proximaDoacaoFormatada)) { ?>
+                        <input type="hidden" name="proxima_doacao" value="<?php echo htmlspecialchars($proximaDoacaoFormatada); ?>">
+                    <?php } ?>
+                    <button type="submit" class="btn btn-primary">Gerar PDF</button>
+                </form>
 
             </nav>
             <div class="container-fluid" id="content">
                 <h1 class="mt-4">Bem Vindo ao Portal do Doador <br> Nome: <?php echo ucfirst($name); ?> <br> CPF: <?php echo ucfirst($cpf); ?> 
-                <br> Data Nascimento: <?php echo ucfirst($nascimento); ?> <br> Genero: <?php echo ucfirst($sexo); ?>  </h1>
+                <br> Data Nascimento: <?php echo ucfirst($nascimento); ?> <br> Sexo: <?php echo ucfirst($sexo); ?>  </h1>
                 <!-- <p>Escolha uma das opções ao lado.</p> -->
                 <!-- Exibir os resultados da query -->
 

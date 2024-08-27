@@ -26,3 +26,23 @@ select TO_CHAR(dt_doaca, 'DD/MM/YYYY') AS DATA_COLETA, OBJ140.TP_OBTHE from OBJ1
 where OBJ110.CD_PESFIDOA = OBJ140.CD_PESFI
 and OBJ110.hr_ultatua iS not NULL
 AND CD_PESFIDOA = '744536'
+
+
+
+
+
+select TO_CHAR(COLETA.dtcoleta, 'DD/MM/YYYY') AS DATA_COLETA, cdtipobtdoacao 
+from coleta, triagemcandidato
+where coleta.cdpesfiscoleta = triagemcandidato.cdpesfisdoacao
+AND COLETA.CDTRIAGEM = TRIAGEMCANDIDATO.CDTRIAGEM
+and hrtermcoleta is not NULL
+and cdpesfiscoleta = '487774'
+
+UNION
+
+select TO_CHAR(dt_doaca, 'DD/MM/YYYY') AS DATA_COLETA, OBJ140.TP_OBTHE 
+from OBJ110, OBJ140
+where OBJ110.CD_PESFIDOA = OBJ140.CD_PESFI
+AND OBJ110.CD_DOACA = OBJ140.CD_DOACA
+and OBJ140.hr_TERMI iS not NULL
+AND CD_PESFIDOA = '487774'

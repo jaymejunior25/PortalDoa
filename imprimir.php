@@ -41,21 +41,12 @@ function gerarEtiquetaZPL($dados, $cpf) {
 }
 
 
-// Função para enviar o ZPL para a impressora Zebra conectada via USB usando o comando print
+// Função para enviar o ZPL para a impressora Zebra conectada via USB
 function imprimirEtiquetaUSB($zpl) {
-    // Cria um arquivo temporário para armazenar o código ZPL
-    $tempFile = tempnam(sys_get_temp_dir(), 'zebra_');
-    file_put_contents($tempFile, $zpl);
-    
-    // Comando para imprimir o arquivo usando a impressora Zebra (ajuste 'Zebra ZT410' para o nome da sua impressora)
-    $printerName = "ZDesigner ZT410-203dpi ZPL (Copiar 1)";
-    $command = 'print /D:"\\\localhost\\' . $printerName . '" ' . $tempFile;
-    
-    // Executa o comando
-    exec($command);
-    
-    // Remove o arquivo temporário após a impressão
-    unlink($tempFile);
+    $file = "USB001";  // Porta padrão de uma impressora USB no Windows
+
+    // Enviar o ZPL diretamente para a impressora
+    file_put_contents($file, $zpl);
 }
 
 // Lógica principal de impressão

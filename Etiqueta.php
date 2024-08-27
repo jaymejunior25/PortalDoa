@@ -29,44 +29,101 @@ function obterDados($cpf) {
 
 // Função para gerar o código ZPL da etiqueta
 function gerarEtiquetaZPL($dados, $cpf) {
+    $nome = $dados['nmpesfis'];
+    $fenotipo = $dados['dsfenotipagem'];
+    $maxCharsPerLine = 30;  // Número máximo de caracteres por linha a depender do tamanho da fonte
+    $maxCharsPerLine2 = 35;  // Número máximo de caracteres por linha a depender do tamanho da fonte
+    $fontSize = 30;  // Fonte para a primeira linha
+    $fontSize2 = 23;  // Fonte para a segunda linha e seguintes
+
+    // Se o nome for muito longo, quebrar em múltiplas linhas
+    if (strlen($nome) > $maxCharsPerLine) {
+        $nome = wordwrap($nome, $maxCharsPerLine, "&", true);
+        $linhasNome = explode("&", $nome);
+    } else {
+        $linhasNome = [$nome];
+    }
+
+    // Tratamento para o fenótipo se ele for muito longo
+    if (strlen($fenotipo) > $maxCharsPerLine2) {
+        $fenotipo = wordwrap($fenotipo, $maxCharsPerLine2, "&", true);
+        $linhasFenotipo = explode("&", $fenotipo);
+    } else {
+        $linhasFenotipo = [$fenotipo];
+    }
+
     $zpl = "^XA";
-    $zpl .= "^FO30,30^A0N,40,40^FD" . $dados['nmpesfis'] . "^FS";  // Nome
-    $zpl .= "^FO30,80^A0N,35,35^FDCPF: " . $cpf . "^FS";  // CPF
-    $zpl .= "^FO30,130^A0N,35,35^FDData Nasc: " . $dados['data_nascimento'] . "^FS";  // Data de nascimento
-    $zpl .= "^FO30,180^A0N,35,35^FDFenótipo: " . $dados['dsfenotipagem'] . "^FS";  // Fenótipo
+    $yOffset = 30;  // Posição inicial Y para o texto
+    $zpl .= "^FO30,$yOffset^A0N,$fontSize,$fontSize^FDNome: " . $linhasNome[0] . "^FS";  // Primeira linha do nome
+
+    // Adiciona linhas adicionais do nome se houver
+    for ($i = 1; $i < count($linhasNome); $i++) {
+        $yOffset += 40; // Incrementa a posição Y para evitar sobreposição (ajuste conforme necessário)
+        $zpl .= "^FO30,$yOffset^A0N,$fontSize,$fontSize^FD" . $linhasNome[$i] . "^FS";
+    }
+
+    // Adiciona as outras informações
+    $yOffset += 50;  // Adiciona um espaço extra após o nome
+    $zpl .= "^FO30,$yOffset^A0N,$fontSize,$fontSize^FDCPF: " . $cpf . "^FS";  // CPF
+    $yOffset += 50;
+    $zpl .= "^FO30,$yOffset^A0N,$fontSize,$fontSize^FDData Nasc: " . $dados['data_nascimento'] . "^FS";  // Data de nascimento
+
+    // Adiciona o fenótipo, linha por linha
+    $yOffset += 50; // Adiciona um espaço extra antes do fenótipo
+    $zpl .= "^FO30,$yOffset^A0N,$fontSize2,$fontSize2^FDFenotipo: " . $linhasFenotipo[0] . "^FS";  // Primeira linha do fenótipo
+
+    for ($i = 1; $i < count($linhasFenotipo); $i++) {
+        $yOffset += 40;  // Incrementa a posição Y para evitar sobreposição
+        $zpl .= "^FO30,$yOffset^A0N,$fontSize2,$fontSize2^FD" . $linhasFenotipo[$i] . "^FS";
+    }
+
     $zpl .= "^XZ";
     
     return $zpl;
 }
 
-// Lógica principal
+// Função para enviar o ZPL para a impressora Zebra conectada via USB
+function imprimirEtiquetaUSB($zpl) {
+    $file = "\\\\localhost\\ZebraZT410server";  // Usando o nome de compartilhamento da impressora
+
+    try {
+        $handle = fopen($file, "wb");
+        if ($handle) {
+            fwrite($handle, $zpl);
+            fclose($handle);
+        } else {
+            echo "Não foi possível abrir a porta USB para a impressora.";
+        }
+    } catch (Exception $e) {
+        echo "Erro ao enviar o comando para a impressora: " . $e->getMessage();
+    }
+}
+
+$dados = null; // Variável para armazenar dados se o CPF for enviado
+
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $cpf = $_POST['cpf'];
-    $dados = obterDados($cpf);
 
-    if ($dados) {
-        // Gera o código ZPL
-        $zpl = gerarEtiquetaZPL($dados, $cpf);
-
-        // Cria um arquivo temporário para armazenar o código ZPL
-        $tempFile = tempnam(sys_get_temp_dir(), 'zebra_');
-        file_put_contents($tempFile, $zpl);
-
-        // Envia o arquivo para download
-        header('Content-Type: application/zpl');
-        header('Content-Disposition: attachment; filename="etiqueta.zpl"');
-        header('Content-Length: ' . filesize($tempFile));
-        readfile($tempFile);
-
-        // Remove o arquivo temporário após o download
-        unlink($tempFile);
-        exit();
+    if (isset($_POST['imprimir'])) {
+        $dados = obterDados($cpf);
+        if ($dados) {
+            $zpl = gerarEtiquetaZPL($dados, $cpf);
+            imprimirEtiquetaUSB($zpl);
+            echo "<p>Etiqueta enviada para a impressora.</p>";
+        } else {
+            echo "<p>Dados não encontrados para o CPF informado.</p>";
+        }
     } else {
-        echo "Dados não encontrados para o CPF informado.";
+        // Quando apenas o CPF é enviado
+        $dados = obterDados($cpf);
+        if (!$dados) {
+            echo "<p>Dados não encontrados para o CPF informado.</p>";
+        }
     }
 }
 ?>
 
+<!-- Formulário HTML para informar o CPF -->
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -86,8 +143,23 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 <label for="cpf">CPF:</label>
                 <input type="text" class="form-control" id="cpf" name="cpf" required>
             </div>
-            <button type="submit" class="btn btn-primary">Gerar Etiqueta</button>
+            <button type="submit" class="btn btn-primary">Buscar Informações</button>
         </form>
+
+        <?php if ($dados): ?>
+            <h3>Informações do CPF</h3>
+            <p>Nome: <?= $dados['nmpesfis']; ?></p>
+            <p>CPF: <?= $cpf; ?></p>
+            <p>Data de Nascimento: <?= $dados['data_nascimento']; ?></p>
+            <p>Fenótipo: <?= $dados['dsfenotipagem']; ?></p>
+
+            <!-- Formulário para confirmar impressão -->
+            <form method="POST">
+                <input type="hidden" name="cpf" value="<?= $cpf; ?>">
+                <input type="hidden" name="imprimir" value="true">
+                <button type="submit" class="btn btn-success">Confirmar Impressão da Etiqueta</button>
+            </form>
+        <?php endif; ?>
     </div>
 </body>
 </html>
