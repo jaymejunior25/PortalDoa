@@ -24,7 +24,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $sexo = $_POST['sexo'];
     $resultados = json_decode($_POST['resultados'], true);
     $proxima_doacao = $_POST['proxima_doacao'] ?? null;
-
+    $tipagem = $_POST['tipagem'];
     // Crie uma nova instância do FPDF
     $pdf = new PDF();
     $pdf->AliasNbPages();
@@ -39,7 +39,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $pdf->Cell(0, 10, 'Nome: ' . $name, 0, 1);
     $pdf->Cell(0, 10, 'CPF: ' . $cpf, 0, 1);
     $pdf->Cell(0, 10, 'Data de Nascimento: ' . $nascimento, 0, 1);
-    $pdf->Cell(0, 10, 'Sexo: ' . $sexo, 0, 1);
+    $pdf->Cell(0, 10, 'Tipagem: ' . $tipagem, 0, 1);
     
     $pdf->Ln(15);
     $pdf->Cell(0, 5, utf8_decode('Declaração de doação'), 0, 1, 'C');

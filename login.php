@@ -20,6 +20,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                    tpdoctoident, 
                    nrdoctoident, 
                    cdsexo,
+                   cdgrpabo,
+                   cdfatorrh,
                    dsfenotipagem 
             FROM pessoafisica 
             JOIN doctopessoafisica ON pessoafisica.cdpesfis = doctopessoafisica.cdpesfis
@@ -38,6 +40,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $_SESSION['pf'] = $user1['cdpesfis'];
         $_SESSION['nasc'] = $user1['data_nascimento'];
         $_SESSION['sexo'] = $user1['cdsexo'];
+        $_SESSION['abo'] = $user1['cdgrpabo'];
+        $_SESSION['rh'] = $user1['cdfatorrh'];
         
         header('Location: index.php');
         exit();

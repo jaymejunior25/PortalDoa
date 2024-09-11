@@ -13,30 +13,45 @@ $cpf =  $_SESSION['cpf'];
 $pf =  $_SESSION['pf'];
 $nascimento =  $_SESSION['nasc'];
 $sexo = $_SESSION['sexo'];
+if ($_SESSION['rh'] === 'P'){
+    $rh = '+';
+}else{
+    $rh = '-';
+}
+$tipagem =  $_SESSION['abo'].$rh;
+
 // Inicializa a variável que armazenará os resultados da query
 $resultados = [];
 
 // Executa a query e armazena os resultados
 try {
     $stmt = $dbconn->prepare("
-        SELECT TO_CHAR(dtcoleta, 'DD/MM/YYYY') AS DATA_COLETA, cdtipobtdoacao 
-        FROM coleta, triagemcandidato
-        WHERE coleta.cdpesfiscoleta = triagemcandidato.cdpesfisdoacao
-        AND coleta.CDTRIAGEM = TRIAGEMCANDIDATO.CDTRIAGEM
+        SELECT 
+            TO_CHAR(dtcoleta, 'DD/MM/YYYY') AS DATA_COLETA, 
+            cdtipobtdoacao, 
+            triagemcandidato.cdavaltriagem, 
+            triagemcandidato.qtdiasinaptidao, 
+            triagemcandidato.dttriagem
+        FROM coleta
+        JOIN triagemcandidato ON coleta.CDTRIAGEM = triagemcandidato.CDTRIAGEM
+        WHERE coleta.cdpesfiscoleta = :PF
         AND hrtermcoleta IS NOT NULL
-        AND cdpesfiscoleta = :PF
 
         UNION
 
-        SELECT TO_CHAR(dt_doaca, 'DD/MM/YYYY') AS DATA_COLETA, OBJ140.TP_OBTHE 
-        FROM OBJ110, OBJ140
-        WHERE OBJ110.CD_PESFIDOA = OBJ140.CD_PESFI
-        AND OBJ110.CD_DOACA = OBJ140.CD_DOACA
-        AND OBJ140.hr_TERMI iS not NULL
-        AND CD_PESFIDOA = :PF
+        SELECT 
+            TO_CHAR(dt_doaca, 'DD/MM/YYYY') AS DATA_COLETA, 
+            OBJ140.TP_OBTHE, 
+            NULL AS cdavaltriagem, 
+            NULL AS qtdiasinaptidao, 
+            NULL AS dttriagem
+        FROM OBJ110
+        JOIN OBJ140 ON OBJ110.CD_PESFIDOA = OBJ140.CD_PESFI
+        WHERE OBJ110.CD_PESFIDOA = :PF
+        AND OBJ140.hr_TERMI IS NOT NULL
 
         ORDER BY DATA_COLETA DESC
-    ");
+    "); 
     $stmt->bindParam(':PF', $pf); 
     $stmt->execute();
    // echo "Query executada com sucesso.<br>";
@@ -61,37 +76,48 @@ try {
 // Calcula a data da próxima doação com base na data de coleta mais recente e no sexo
 if (!empty($resultados)) {
     $dataColetaMaisRecente = DateTime::createFromFormat('d/m/Y', $resultados[0]['data_coleta']);
+    $cdavaltriagem = $resultados[0]['cdavaltriagem'];
+    $qtdiasinaptidao = $resultados[0]['qtdiasinaptidao'] ?? 0;
+    $dttriagem = isset($resultados[0]['dttriagem']) ? DateTime::createFromFormat('Y-m-d', $resultados[0]['dttriagem']) : null;
     
-    // Verifica o número de doações nos últimos 12 meses
-    $doacoesUltimos12Meses = 0;
-    $dataLimite12Meses = (new DateTime())->modify('-12 months');
+    if ($cdavaltriagem === 'AP') {
+        // Verifica o número de doações nos últimos 12 meses
+        $doacoesUltimos12Meses = 0;
+        $dataLimite12Meses = (new DateTime())->modify('-12 months');
 
-    foreach ($resultados as $resultado) {
-        $dataColeta = DateTime::createFromFormat('d/m/Y', $resultado['data_coleta']);
-        if ($dataColeta >= $dataLimite12Meses) {
-            $doacoesUltimos12Meses++;
-        } else {
-            break; // Como a lista está ordenada por data desc, podemos parar o loop
+        foreach ($resultados as $resultado) {
+            $dataColeta = DateTime::createFromFormat('d/m/Y', $resultado['data_coleta']);
+            if ($dataColeta >= $dataLimite12Meses) {
+                $doacoesUltimos12Meses++;
+            } else {
+                break; // Como a lista está ordenada por data desc, podemos parar o loop
+            }
         }
+
+        // Calcula a próxima data de doação com base nas regras e no número de doações nos últimos 12 meses
+        if ($sexo === 'M') {
+            // Limite de 4 doações nos últimos 12 meses para homens
+            if ($doacoesUltimos12Meses < 4) {
+                $dataProximaDoacao = $dataColetaMaisRecente->modify('+2 months +2 days');
+            } else { 
+                $dataProximaDoacao = $dataLimite12Meses->modify('+12 months +2 days');
+            }
+        } else if ($sexo === 'F') {
+            // Limite de 3 doações nos últimos 12 meses para mulheres
+            if ($doacoesUltimos12Meses < 3) {
+                $dataProximaDoacao = $dataColetaMaisRecente->modify('+3 months +2 days');
+            } else {
+                $dataProximaDoacao = $dataLimite12Meses->modify('+12 months +2 days');
+            }
+        }
+    }elseif ($cdavaltriagem === 'RT' && $dttriagem !== null) {
+        // Se for "RT", usa `qtdiasinaptidao` para calcular a próxima data com base na `dttriagem`
+        $dataProximaDoacao = $dttriagem->modify("+$qtdiasinaptidao days");
+    } elseif ($cdavaltriagem === 'RD') {
+        // Se for "RD", não há data de próxima doação
+        $dataProximaDoacao = null;
+        $mensagem = 'O usuário foi recusado em definitivo.';
     }
-
-    // Calcula a próxima data de doação com base nas regras e no número de doações nos últimos 12 meses
-    if ($sexo === 'M') {
-        // Limite de 4 doações nos últimos 12 meses para homens
-        if ($doacoesUltimos12Meses < 4) {
-            $dataProximaDoacao = $dataColetaMaisRecente->modify('+2 months +2 days');
-        } else { 
-            $dataProximaDoacao = $dataLimite12Meses->modify('+12 months +2 days');
-        }
-    } else if ($sexo === 'F') {
-        // Limite de 3 doações nos últimos 12 meses para mulheres
-        if ($doacoesUltimos12Meses < 3) {
-            $dataProximaDoacao = $dataColetaMaisRecente->modify('+3 months +2 days');
-        } else {
-            $dataProximaDoacao = $dataLimite12Meses->modify('+12 months +2 days');
-        }
-    }
-
     if (isset($dataProximaDoacao)) {
         $proximaDoacaoFormatada = $dataProximaDoacao->format('d/m/Y');
     }
@@ -140,6 +166,7 @@ if (!empty($resultados)) {
                     <input type="hidden" name="cpf" value="<?php echo htmlspecialchars($cpf); ?>">
                     <input type="hidden" name="nascimento" value="<?php echo htmlspecialchars($nascimento); ?>">
                     <input type="hidden" name="sexo" value="<?php echo htmlspecialchars($sexo); ?>">
+                    <input type="hidden" name="tipagem" value="<?php echo htmlspecialchars($tipagem); ?>">
                     <input type="hidden" name="resultados" value="<?php echo htmlspecialchars(json_encode($resultados)); ?>">
                     <?php if (isset($proximaDoacaoFormatada)) { ?>
                         <input type="hidden" name="proxima_doacao" value="<?php echo htmlspecialchars($proximaDoacaoFormatada); ?>">
@@ -149,8 +176,9 @@ if (!empty($resultados)) {
 
             </nav>
             <div class="container-fluid" id="content">
-                <h1 class="mt-4">Bem Vindo ao Portal do Doador <br> Nome: <?php echo ucfirst($name); ?> <br> CPF: <?php echo ucfirst($cpf); ?> 
-                <br> Data Nascimento: <?php echo ucfirst($nascimento); ?> <br> Sexo: <?php echo ucfirst($sexo); ?>  </h1>
+                <h2 class="mt-4">Bem Vindo ao Portal do Doador <br> Nome: <?php echo ucfirst($name); ?> <br> CPF: <?php echo ucfirst($cpf); ?> 
+                <br> Data Nascimento: <?php echo ucfirst($nascimento); ?> <br> Tipagem: <?php echo ucfirst($tipagem); ?>  </h2>
+                
                 <!-- <p>Escolha uma das opções ao lado.</p> -->
                 <!-- Exibir os resultados da query -->
 
@@ -158,10 +186,11 @@ if (!empty($resultados)) {
 
                 <p><strong>Total de doações:</strong> <?php echo count($resultados); ?></p>
 
-                <?php if (isset($proximaDoacaoFormatada)) { ?>
-                        <p><strong>Data da próxima doação:</strong> <?php echo $proximaDoacaoFormatada; ?></p>
-                    <?php } ?>
-
+                <?php if (isset($mensagem)) { ?>
+                    <p><strong>Status:</strong> <?php echo $mensagem; ?></p>
+                <?php } elseif (isset($proximaDoacaoFormatada)) { ?>
+                    <p><strong>Data da próxima doação:</strong> <?php echo $proximaDoacaoFormatada; ?></p>
+                <?php } ?>
                 <?php if (!empty($resultados)) { ?>
                     <table class="table table-bordered">
                         <thead>
