@@ -22,10 +22,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                    cdsexo,
                    cdgrpabo,
                    cdfatorrh,
-                   dsfenotipagem 
+                   dsfenotipagem,
+                   cdclaspesfis
             FROM pessoafisica 
             JOIN doctopessoafisica ON pessoafisica.cdpesfis = doctopessoafisica.cdpesfis
-            WHERE tpdoctoident = 'CPF' 
+            WHERE tpdoctoident = 'RG' 
             AND nrdoctoident = :CPF";
     
     $stmt = $dbconn->prepare($sql);
@@ -42,6 +43,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $_SESSION['sexo'] = $user1['cdsexo'];
         $_SESSION['abo'] = $user1['cdgrpabo'];
         $_SESSION['rh'] = $user1['cdfatorrh'];
+        $_SESSION['situacao'] = $user1['cdclaspesfis'];
         
         header('Location: index.php');
         exit();

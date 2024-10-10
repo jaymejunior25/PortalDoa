@@ -153,8 +153,8 @@
                     <label for="cpf">CPF:</label>
                     <input type="text" class="form-control" id="cpf" name="cpf" required>
                 </div>
-                <p>IP: <?= $ip; ?></p>
-                <p>IP2: <?= $user_ip; ?></p> 
+                <!-- <p>IP: <?= $ip; ?></p>
+                <p>IP2: <?= $user_ip; ?></p>  -->
                 <button type="submit" class="btn btn-primary">Buscar Informações</button>
             </form>
 
@@ -166,7 +166,7 @@
                 <p>Fenótipo: <?= $dados['dsfenotipagem']; ?></p>
 
                 <!-- Formulário para confirmar impressão -->
-                <form method="POST"> --
+                <form method="POST">
                     <input type="hidden" name="cpf" value="<?= $cpf; ?>">
                     <input type="hidden" name="imprimir" value="true">
                     <button type="submit" class="btn btn-success">Confirmar Impressão da Etiqueta</button>

@@ -50,7 +50,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $pdf->Ln(15);
     // Adicione a próxima data de doação, se disponível
     if ($proxima_doacao) {
-        $pdf->Cell(0, 10, utf8_decode('Data da próxima doação: ') . $proxima_doacao, 0, 1);
+        $pdf->Cell(0, 10, utf8_decode('Data da próxima doação: Apartir de ') . $proxima_doacao, 0, 1);
     }
     $pdf->Ln(15);
 

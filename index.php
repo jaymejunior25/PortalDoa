@@ -31,24 +31,27 @@ try {
             cdtipobtdoacao, 
             triagemcandidato.cdavaltriagem, 
             triagemcandidato.qtdiasinaptidao, 
+            
             triagemcandidato.dttriagem
         FROM coleta
         JOIN triagemcandidato ON coleta.CDTRIAGEM = triagemcandidato.CDTRIAGEM
         WHERE coleta.cdpesfiscoleta = :PF
+        and coleta.cdpesfiscoleta = triagemcandidato.cdpesfisdoacao
         AND hrtermcoleta IS NOT NULL
 
         UNION
 
         SELECT 
-            TO_CHAR(dt_doaca, 'DD/MM/YYYY') AS DATA_COLETA, 
+            TO_CHAR(dt_colet, 'DD/MM/YYYY') AS DATA_COLETA, 
             OBJ140.TP_OBTHE, 
-            NULL AS cdavaltriagem, 
-            NULL AS qtdiasinaptidao, 
-            NULL AS dttriagem
-        FROM OBJ110
-        JOIN OBJ140 ON OBJ110.CD_PESFIDOA = OBJ140.CD_PESFI
-        WHERE OBJ110.CD_PESFIDOA = :PF
+            cd_avtri AS cdavaltriagem, 
+            qt_tempina AS qtdiasinaptidao, 
+            dt_triag   AS dttriagem
+        FROM OBJ150
+        JOIN OBJ140 ON OBJ150.CD_PESFI = OBJ140.CD_PESFI
+        WHERE OBJ150.CD_PESFI = :PF
         AND OBJ140.hr_TERMI IS NOT NULL
+        AND OBJ150.CD_triag = OBJ140.CD_DOACA
 
         ORDER BY DATA_COLETA DESC
     "); 
@@ -110,10 +113,12 @@ if (!empty($resultados)) {
                 $dataProximaDoacao = $dataLimite12Meses->modify('+12 months +2 days');
             }
         }
-    }elseif ($cdavaltriagem === 'RT' && $dttriagem !== null) {
+    }
+    //elseif ($cdavaltriagem === 'RT' && $dttriagem !== null) {
+        elseif (($cdavaltriagem === 'RT' || $_SESSION['situacao'] === '02' ) ) {
         // Se for "RT", usa `qtdiasinaptidao` para calcular a próxima data com base na `dttriagem`
         $dataProximaDoacao = $dttriagem->modify("+$qtdiasinaptidao days");
-    } elseif ($cdavaltriagem === 'RD') {
+    } elseif ($cdavaltriagem === 'RD' || $_SESSION['situacao'] === '03') {
         // Se for "RD", não há data de próxima doação
         $dataProximaDoacao = null;
         $mensagem = 'O usuário foi recusado em definitivo.';
@@ -143,8 +148,9 @@ if (!empty($resultados)) {
         <div class="bg-dark border-right" id="sidebar-wrapper">
             <div class="sidebar-heading text-white">Menu</div>
             <div class="list-group list-group-flush">
-                <a href="index.php" class="list-group-item list-group-item-action bg-dark text-white">Voltar ao Index</a>
-                <a href="#" class="list-group-item list-group-item-action bg-dark text-white" onclick="loadPage('home')">Home</a>
+                <a href="index.php" class="list-group-item list-group-item-action bg-dark text-white">Home</a>
+                <!-- <a href="#" class="list-group-item list-group-item-action bg-dark text-white" onclick="loadPage('home')">Home</a> -->
+                <a href="ResultadoE.php" class="list-group-item list-group-item-action bg-dark text-white">Resultado dos Exames</a>
                 <a href="#" class="list-group-item list-group-item-action bg-dark text-white" onclick="loadPage('about')">Serviço 1</a>
                 <a href="#" class="list-group-item list-group-item-action bg-dark text-white" onclick="loadPage('services')">Serviço 2</a>
                 <a href="#" class="list-group-item list-group-item-action bg-dark text-white" onclick="loadPage('Etiqueta')">Etiqueta 3</a>
