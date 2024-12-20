@@ -31,10 +31,10 @@
     function gerarEtiquetaZPL($dados, $cpf) {
         $nome = $dados['nmpesfis'];
         $fenotipo = $dados['dsfenotipagem'];
-        $maxCharsPerLine = 30;  // Número máximo de caracteres por linha a depender do tamanho da fonte
-        $maxCharsPerLine2 = 35;  // Número máximo de caracteres por linha a depender do tamanho da fonte
-        $fontSize = 30;  // Fonte para a primeira linha
-        $fontSize2 = 23;  // Fonte para a segunda linha e seguintes
+        $maxCharsPerLine = 37;  // Número máximo de caracteres por linha a depender do tamanho da fonte
+        $maxCharsPerLine2 = 45;  // Número máximo de caracteres por linha a depender do tamanho da fonte
+        $fontSize = 27;  // Fonte para a primeira linha
+        $fontSize2 = 20;  // Fonte para a segunda linha e seguintes
 
         // Se o nome for muito longo, quebrar em múltiplas linhas
         if (strlen($nome) > $maxCharsPerLine) {
@@ -48,13 +48,20 @@
         if (strlen($fenotipo) > $maxCharsPerLine2) {
             $fenotipo = wordwrap($fenotipo, $maxCharsPerLine2, "&", true);
             $linhasFenotipo = explode("&", $fenotipo);
+            if (count($linhasFenotipo) > 1) {
+                $maxCharsPerLine2 += 10; // Aumentar limite de caracteres se "Fenotipo" for maior
+            }
         } else {
             $linhasFenotipo = [$fenotipo];
+        }
+        // Ajuste do limite de caracteres por linha para o nome se o fenótipo tiver múltiplas linhas
+        if (count($linhasFenotipo) > 1) {
+            $maxCharsPerLine2 += 7; // Aumentar limite de caracteres se "Fenotipo" for maior
         }
 
         $zpl = "^XA";
         $yOffset = 30;  // Posição inicial Y para o texto
-        $zpl .= "^FO30,$yOffset^A0N,$fontSize,$fontSize^FDNome: " . $linhasNome[0] . "^FS";  // Primeira linha do nome
+        $zpl .= "^FO30,$yOffset^A0N,$fontSize,$fontSize^FD   Nome: " . $linhasNome[0] . "^FS";  // Primeira linha do nome
 
         // Adiciona linhas adicionais do nome se houver
         for ($i = 1; $i < count($linhasNome); $i++) {
@@ -63,18 +70,18 @@
         }
 
         // Adiciona as outras informações
-        $yOffset += 50;  // Adiciona um espaço extra após o nome
-        $zpl .= "^FO30,$yOffset^A0N,$fontSize,$fontSize^FDCPF: " . $cpf . "^FS";  // CPF
-        $yOffset += 50;
-        $zpl .= "^FO30,$yOffset^A0N,$fontSize,$fontSize^FDData Nasc: " . $dados['data_nascimento'] . "^FS";  // Data de nascimento
+        $yOffset += 45;  // Adiciona um espaço extra após o nome
+        $zpl .= "^FO30,$yOffset^A0N,$fontSize,$fontSize^FD   CPF: " . $cpf . "   Data Nasc: " . $dados['data_nascimento']. "^FS";  // CPF
+        // $yOffset += 50;
+        // $zpl .= "^FO30,$yOffset^A0N,$fontSize,$fontSize^FD  Data Nasc: " . $dados['data_nascimento'] . "^FS";  // Data de nascimento
 
         // Adiciona o fenótipo, linha por linha
-        $yOffset += 50; // Adiciona um espaço extra antes do fenótipo
-        $zpl .= "^FO30,$yOffset^A0N,$fontSize2,$fontSize2^FDFenotipo: " . $linhasFenotipo[0] . "^FS";  // Primeira linha do fenótipo
+        $yOffset += 45; // Adiciona um espaço extra antes do fenótipo
+        $zpl .= "^FO30,$yOffset^A0N,$fontSize2,$fontSize2^FD   Fenotipo: " . $linhasFenotipo[0] . "^FS";  // Primeira linha do fenótipo
 
         for ($i = 1; $i < count($linhasFenotipo); $i++) {
-            $yOffset += 40;  // Incrementa a posição Y para evitar sobreposição
-            $zpl .= "^FO30,$yOffset^A0N,$fontSize2,$fontSize2^FD" . $linhasFenotipo[$i] . "^FS";
+            $yOffset += 35;  // Incrementa a posição Y para evitar sobreposição
+            $zpl .= "^FO30,$yOffset^A0N,$fontSize2,$fontSize2^FD  " . $linhasFenotipo[$i] . "^FS";
         }
 
         $zpl .= "^XZ";

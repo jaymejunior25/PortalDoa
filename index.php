@@ -3,7 +3,7 @@ session_start();
 include 'db.php';
 
 if (!isset($_SESSION['user_id'])) {
-    header('Location: login.php');
+    header('Location: informacoes.php');
     exit();
 }
 
@@ -141,6 +141,19 @@ if (!empty($resultados)) {
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
     <link href="css/styles.css" rel="stylesheet">
     <link rel="icon" type="image/png" href="icon2.png" sizes="32x32" />
+    <style>
+        .align-right {
+            float: right;
+            margin-right: 0;
+        }
+        .align-right-top {
+            position: absolute;
+            top: 45px;   /* Alinha ao topo */
+            right: 0; /* Alinha à direita */
+            padding: 20px;
+        }
+        
+    </style>
 </head>
 <body>
     <div class="d-flex" id="wrapper">
@@ -166,37 +179,58 @@ if (!empty($resultados)) {
                 </button>
 
                 <a href="logout.php" class="btn btn-danger "><i class="fas fa-sign-out-alt"></i> Logout</a>
-                <!-- Botão para gerar PDF -->
-                <form action="gerar_pdf.php" method="post">
-                    <input type="hidden" name="name" value="<?php echo htmlspecialchars($name); ?>">
-                    <input type="hidden" name="cpf" value="<?php echo htmlspecialchars($cpf); ?>">
-                    <input type="hidden" name="nascimento" value="<?php echo htmlspecialchars($nascimento); ?>">
-                    <input type="hidden" name="sexo" value="<?php echo htmlspecialchars($sexo); ?>">
-                    <input type="hidden" name="tipagem" value="<?php echo htmlspecialchars($tipagem); ?>">
-                    <input type="hidden" name="resultados" value="<?php echo htmlspecialchars(json_encode($resultados)); ?>">
-                    <?php if (isset($proximaDoacaoFormatada)) { ?>
-                        <input type="hidden" name="proxima_doacao" value="<?php echo htmlspecialchars($proximaDoacaoFormatada); ?>">
-                    <?php } ?>
-                    <button type="submit" class="btn btn-primary">Gerar PDF</button>
-                </form>
+
 
             </nav>
             <div class="container-fluid" id="content">
-                <h2 class="mt-4">Bem Vindo ao Portal do Doador <br> Nome: <?php echo ucfirst($name); ?> <br> CPF: <?php echo ucfirst($cpf); ?> 
-                <br> Data Nascimento: <?php echo ucfirst($nascimento); ?> <br> Tipagem: <?php echo ucfirst($tipagem); ?>  </h2>
-                
+                <h2 class="mt-4">Bem Vindo ao Portal do Doador </h2><br> 
+                <div class="mb-4">
+                    <p><strong>Nome:</strong> <?php echo ucfirst($name); ?> </p> 
+                    <p><strong>CPF:</strong> <?php echo ucfirst($cpf); ?> </p>
+                    <p><strong>Data Nascimento:</strong> <?php echo ucfirst($nascimento); ?> </p>
+                    <p><strong>Tipagem:</strong> <?php echo ucfirst($tipagem); ?>  </p>
+                </div>
                 <!-- <p>Escolha uma das opções ao lado.</p> -->
                 <!-- Exibir os resultados da query -->
 
-                <h2>Resultados de Coleta e Doação</h2>
+                <h3>Resultados de Coleta e Doação</h3>
 
-                <p><strong>Total de doações:</strong> <?php echo count($resultados); ?></p>
-
-                <?php if (isset($mensagem)) { ?>
-                    <p><strong>Status:</strong> <?php echo $mensagem; ?></p>
-                <?php } elseif (isset($proximaDoacaoFormatada)) { ?>
-                    <p><strong>Data da próxima doação:</strong> <?php echo $proximaDoacaoFormatada; ?></p>
-                <?php } ?>
+                <h3><p><center><strong>Total de doações:</strong> <?php echo count($resultados); ?></center></p></h3>
+                <div class="align-right-top">
+                    <?php if (isset($mensagem)) { ?>
+                        <p><h1><strong>Status:</strong> <?php echo $mensagem; ?></h1> </p>
+                    <?php } elseif (isset($proximaDoacaoFormatada)) { ?>
+                        <p><h2><strong>Data da próxima doação:</strong> a partir de  <?php echo $proximaDoacaoFormatada; ?></h2> </p>
+                    <?php } ?>
+                </div>
+                <div class="align-right">
+                    <!-- Botão para gerar PDF -->
+                    <form action="gerar_pdf.php" method="post">
+                        <input type="hidden" name="name" value="<?php echo htmlspecialchars($name); ?>">
+                        <input type="hidden" name="cpf" value="<?php echo htmlspecialchars($cpf); ?>">
+                        <input type="hidden" name="nascimento" value="<?php echo htmlspecialchars($nascimento); ?>">
+                        <input type="hidden" name="sexo" value="<?php echo htmlspecialchars($sexo); ?>">
+                        <input type="hidden" name="tipagem" value="<?php echo htmlspecialchars($tipagem); ?>">
+                        <input type="hidden" name="resultados" value="<?php echo htmlspecialchars(json_encode($resultados)); ?>">
+                        <?php if (isset($proximaDoacaoFormatada)) { ?>
+                            <input type="hidden" name="proxima_doacao" value="<?php echo htmlspecialchars($proximaDoacaoFormatada); ?>">
+                        <?php } ?>
+                        <button type="submit" class="btn btn-primary">Gerar Declaração</button>
+                    </form>
+                    <!-- Novo botão para gerar PDF dos últimos 12 meses -->
+                    <form action="declaracao_doacoes_ultimos_12_meses.php" method="post" style="display:inline;">
+                        <input type="hidden" name="name" value="<?php echo htmlspecialchars($name); ?>">
+                        <input type="hidden" name="cpf" value="<?php echo htmlspecialchars($cpf); ?>">
+                        <input type="hidden" name="nascimento" value="<?php echo htmlspecialchars($nascimento); ?>">
+                        <input type="hidden" name="sexo" value="<?php echo htmlspecialchars($sexo); ?>">
+                        <input type="hidden" name="tipagem" value="<?php echo htmlspecialchars($tipagem); ?>">
+                        <input type="hidden" name="resultados" value="<?php echo htmlspecialchars(json_encode($resultados)); ?>">
+                        <?php if (isset($proximaDoacaoFormatada)) { ?>
+                            <input type="hidden" name="proxima_doacao" value="<?php echo htmlspecialchars($proximaDoacaoFormatada); ?>">
+                        <?php } ?>
+                        <button type="submit" class="btn btn-primary">Gerar Declaração (Últimos 12 meses)</button>
+                    </form>
+                </div>
                 <?php if (!empty($resultados)) { ?>
                     <table class="table table-bordered">
                         <thead>
@@ -209,7 +243,22 @@ if (!empty($resultados)) {
                             <?php foreach ($resultados as $row) { ?>
                                 <tr>
                                     <td><?php echo htmlspecialchars($row['data_coleta'] ?? ''); ?></td>
-                                    <td><?php echo htmlspecialchars($row['cdtipobtdoacao'] ?? $row['TP_OBTHE']); ?></td>
+                                    <td>
+                                    <?php
+                                    // Captura o valor da coluna 'cdtipobtdoacao' ou 'TP_OBTHE'
+                                    $tipoDoacao = $row['cdtipobtdoacao'] ?? $row['TP_OBTHE'];
+
+                                    // Verifica o valor e exibe o texto correspondente
+                                    if ($tipoDoacao === 'FR') {
+                                        echo 'Convencional';
+                                    } elseif ($tipoDoacao === 'AF') {
+                                        echo 'Aférese';
+                                    } else {
+                                        // Se não for nenhum dos dois, exibe o valor original (ou algo padrão)
+                                        echo htmlspecialchars($tipoDoacao);
+                                    }
+                                    ?>
+                                </td>
                                 </tr>
                             <?php } ?>
                         </tbody>

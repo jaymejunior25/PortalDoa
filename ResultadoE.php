@@ -3,7 +3,7 @@ session_start();
 include 'db.php';
 
 if (!isset($_SESSION['user_id'])) {
-    header('Location: login.php');
+    header('Location: informacoes.php');
     exit();
 }
 
@@ -125,6 +125,8 @@ foreach ($dadosAgrupados as $chave => $grupo) {
     }
 }
 
+$primeiroGrupoExibido = false; // Variável para controlar a exibição do primeiro grupo
+
 ?>
 <!DOCTYPE html>
 <html lang="pt-br">
@@ -187,6 +189,7 @@ foreach ($dadosAgrupados as $chave => $grupo) {
                                     <th>Código da Triagem</th>
                                     <th>Data da Coleta</th>
                                     <th>Ações</th>
+                                   
                                 </tr>
                             </thead>
                             <?php }?>
@@ -200,6 +203,9 @@ foreach ($dadosAgrupados as $chave => $grupo) {
                                             //         break;
                                             //     }
                                             // }
+                                            if ($primeiroGrupoExibido)   { 
+                                                break;
+                                             }
                                             
                                             if ((!$temResultadoPositivo) && (!$temResultadoimcompleto) || (isset($grupo[0]['cdresult']) && (!$grupo[0]['cdresult'] == 'S')) ) { ?>                                
                                                 <tr class="collapse-table-row" data-toggle="collapse" data-target="#grupo-<?php echo htmlspecialchars($chave); ?>">
@@ -214,7 +220,7 @@ foreach ($dadosAgrupados as $chave => $grupo) {
                                                                 <input type="hidden" name="dados_grupo" value="<?php echo htmlspecialchars(json_encode($grupo)); ?>">
                                                                 <button type="submit" class="btn btn-primary">Gerar PDF</button>
                                                             </form>
-                                                            
+                                                            <?php $primeiroGrupoExibido = true;?>
                                                         <?php }?>
                                         </td>
                                         <?php } ?>
@@ -302,7 +308,7 @@ foreach ($dadosAgrupados as $chave => $grupo) {
                     if (collapse.classList.contains('show')) {
                         button.textContent = 'Expandir';
                     } else {
-                        button.textContent = 'Colapsar';
+                        button.textContent = 'Contrair';
                     }
                 });
             });

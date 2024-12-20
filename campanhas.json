@@ -1,0 +1,142 @@
+[
+    {
+        "Nome": "ACOMPANHE NOSSAS CAMPANHAS DE DOAÇÃO DE SANGUE"
+    },
+    {
+        "Nome": "Dezembro"
+    },
+    {
+        "Nome": "Escola Temístocles de Araújo (Campanha Externa)",
+        "Data": "03/12/2024",
+        "Local": "Rua WE 2, 771- Marambaia",
+        "Hora": "8h às 16h",
+        "Previsão de Voluntários": "80 voluntários",
+        "Infraestrutura": "sala montada"
+    },
+    {
+        "Nome": "UPA CARLOS MARIGUELA (Campanha Interna)",
+        "Data": "03/12/2024",
+        "Hora": "10h",
+        "Previsão de Voluntários": "20 voluntários",
+        "Local": "Posto de Coleta do Shopping Metrópole"
+    },
+    {
+        "Nome": "Equatorial (Campanha Externa)",
+        "Data": "04/12/2024",
+        "Local": "Rod. Augusto Montenegro km 8.5 – Coqueiro",
+        "Hora": "8h às 16h",
+        "Previsão de Voluntários": "80 voluntários",
+        "Infraestrutura": "sala montada"
+    },
+    {
+        "Nome": "Paróquia São Francisco do Murinim (Campanha Externa)",
+        "Data": "05/12/2024",
+        "Local": "Rua Fluminense, 8-Murinim, prédio da Agência Distrital",
+        "Hora": "8h às 16h",
+        "Previsão de Voluntários": "100 voluntários",
+        "Infraestrutura": "unidade móvel e sala montada"
+    },
+    {
+        "Nome": "Prefeitura de Benevides (Campanha Externa)",
+        "Data": "06/12/2024",
+        "Local": "Semteps – Rua Raul Begot, 236 – Centro",
+        "Hora": "8h às 17h",
+        "Previsão de Voluntários": "150 voluntários",
+        "Infraestrutura": "unidade móvel e sala montada"
+    },
+    {
+        "Nome": "UFPA – Mirante do Rio (Campanha Externa)",
+        "Data": "09/12/2024",
+        "Local": "Rua Augusto Correa, 01 – Guamá",
+        "Previsão de Voluntários": "50 voluntários",
+        "Hora": "9h às 17h",
+        "Infraestrutura": "unidade móvel e trailer"
+    },
+    {
+        "Nome": "Paróquia Santuário de Aparecida (Campanha Externa)",
+        "Data": "10/12/2024",
+        "Local": "Av. Pedro Miranda, 1566 – Pedreira",
+        "Hora": "8h às 16h",
+        "Previsão de Voluntários": "80 voluntários",
+        "Infraestrutura": "trailer e sala montada"
+    },
+    {
+        "Nome": "O Liberal (Campanha Externa)",
+        "Data": "11/12/2024",
+        "Local": "Av. Rômulo Maiorana, 2473 – Marco",
+        "Hora": "8h às 16h",
+        "Previsão de Voluntários": "60 voluntários",
+        "Infraestrutura": "unidade móvel e trailer"
+    },
+    {
+        "Nome": "CETAM (Campanha Externa)",
+        "Data": "12/12/2024",
+        "Local": "Av. Governador José Malcher, 1255 – Nazaré",
+        "Hora": "8h às 17h",
+        "Previsão de Voluntários": "150 voluntários",
+        "Infraestrutura": "sala montada"
+    },
+    {
+        "Nome": "Escola Maria Helena Tavares (Campanha Externa)",
+        "Data": "14/12/2024",
+        "Hora": "8h às 16h",
+        "Previsão de Voluntários": "100 voluntários",
+        "Infraestrutura": "sala montada"
+    },
+    {
+        "Nome": "UFPA – Mirante do Rio (Campanha Externa)",
+        "Data": "16/12/2024",
+        "Local": "Rua Augusto Correa, 01 – Guamá",
+        "Previsão de Voluntários": "50 voluntários",
+        "Hora": "9h às 17h",
+        "Infraestrutura": "unidade móvel e trailer"
+    },
+    {
+        "Nome": "2º BIS (Campanha Externa)",
+        "Data": "17/12/2024",
+        "Local": "Av. Almirante Barroso, 4421 – Souza",
+        "Hora": "8h às 16h",
+        "Previsão de Voluntários": "100 voluntários",
+        "Infraestrutura": "sala montada , unidade móvel e trailer"
+    },
+    {
+        "Nome": "UFPA – Mirante do Rio (Campanha Externa)",
+        "Data": "18/12/2024",
+        "Local": "Rua Augusto Correa, 01 – Guamá",
+        "Previsão de Voluntários": "50 voluntários",
+        "Hora": "9h às 17h",
+        "Infraestrutura": "unidade móvel e trailer"
+    },
+    {
+        "Nome": "Pronto Socorro da Augusto Montenegro Dr. Roberto Macedo (Campanha Externa)",
+        "Data": "19/12/2024",
+        "Local": "Rod. Augusto Montenegro, 552 – Parque Guajará",
+        "Hora": "8h às 17h",
+        "Previsão de Voluntários": "80 voluntários",
+        "Infraestrutura": "sala montada, unidade móvel e trailer"
+    },
+    {
+        "Nome": "Hospital Oncológico Infantil (Campanha Externa)",
+        "Data": "27/12/2024",
+        "Local": "Av. Arthur Bernardes, 1000 – Telégrafo",
+        "Hora": "8h às 17h",
+        "Previsão de Voluntários": "80 voluntários",
+        "Infraestrutura": "unidade móvel e trailer"
+    },
+    {
+        "Nome": "Estação Cidadania Icoaraci (Campanha Externa)",
+        "Data": "27/12/2024",
+        "Local": "Av. Lopo de Castro",
+        "Hora": "9h às 14h",
+        "Previsão de Voluntários": "50 voluntários",
+        "Infraestrutura": "unidade móvel e trailer"
+    },
+    {
+        "Nome": "Estação Cidadania Icoaraci (Campanha Externa)",
+        "Data": "28/12/2024",
+        "Local": "Av. Lopo de Castro",
+        "Hora": "9h às 14h",
+        "Previsão de Voluntários": "50 voluntários",
+        "Infraestrutura": "unidade móvel e trailer"
+    }
+]

@@ -18,7 +18,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         WHERE d.nrdoctoident = :nrdoctoident
     ');
     $stmt->execute([':nrdoctoident' => $cpf]);
-    $user = $stmt->fetch(PDO::FETCH_ASSOC);
+    $  = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if ($user) {
         // Gerar um token seguro para o link de redefinição de senha

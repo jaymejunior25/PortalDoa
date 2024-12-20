@@ -5,7 +5,15 @@ and tpdoctoident = 'CPF'
 
 
 etiqueta 7,1cm x 2,3cm
+
+
 etiqueta 7,9cm x 4 cm
+
+etiqueta 8 cm x 3 cm
+
+
+etiqueta  9,5 cm x 3,5 cm
+
 
 select pessoafisica.cdpesfis, nmpesfis, TO_CHAR(DHNASCTO, 'DD/MM/YYYY') AS data_nascimento, tpdoctoident, nrdoctoident, dsfenotipagem from pessoafisica, doctopessoafisica
 WHERE PESSOAFISICA.CDPESFIS = DOCTOPESSOAFISICA.CDPESFIS
